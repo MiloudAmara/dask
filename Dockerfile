@@ -14,12 +14,14 @@ RUN wget -q https://repo.anaconda.com/miniconda/Miniconda3-py39_4.10.3-Linux-x86
 FROM databricksruntime/minimal:9.x
  
 COPY --from=builder /databricks/conda /databricks/conda
- 
+
 COPY env.yml /databricks/.conda-env-def/env.yml
  
 RUN /databricks/conda/bin/conda env create --file /databricks/.conda-env-def/env.yml \
-    # Source conda.sh for all login shells.
-    && ln -s /databricks/conda/etc/profile.d/conda.sh /etc/profile.d/conda.sh
+    && /databricks/conda/bin/conda clean --all 
+    
+# Source conda.sh for all login shells.
+RUN ln -s /databricks/conda/etc/profile.d/conda.sh /etc/profile.d/conda.sh
  
 # Conda recommends using strict channel priority speed up conda operations and reduce package incompatibility problems.
 # Set always_yes to avoid needing -y flags, and improve conda experience in Databricks notebooks.
